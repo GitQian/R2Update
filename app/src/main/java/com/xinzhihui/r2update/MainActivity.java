@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mCheckBtn;
 
     public ProgressDialog mDownLoadProgress;
+    public ProgressDialog mUpdateProgress;
 
     private CheckUpdateBean mCheckUpdateBean;
 
@@ -77,12 +78,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case AppConfig.DOWN_LOAD_FINISH:
                     if (!mActivity.get().isFinishing()) {
                         mActivity.get().mDownLoadProgress.dismiss();
+
+                        mActivity.get().mUpdateProgress.show();
                     }
                     break;
 
                 case AppConfig.DOWN_LOAD_ERROR:
                     if (!mActivity.get().isFinishing()) {
                         mActivity.get().mDownLoadProgress.dismiss();
+                    }
+                    break;
+
+                case AppConfig.UPDATE_START:
+                    if (!mActivity.get().isFinishing()) {
+                        mActivity.get().mUpdateProgress.show();
+                    }
+                    break;
+
+                case AppConfig.UPDATE_FINISH:
+                    if (!mActivity.get().isFinishing()) {
+                        mActivity.get().mUpdateProgress.dismiss();
                     }
                     break;
 
@@ -161,6 +176,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDownLoadProgress.setProgress(0);
         mDownLoadProgress.setMax(100);
         mDownLoadProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+        mUpdateProgress = new ProgressDialog(MainActivity.this);
+        mUpdateProgress.setMessage("正在升级中...");
+        mUpdateProgress.setCancelable(false);
     }
 
     @Override
@@ -237,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     })
                                     .create();
                             alertDialog.show();
+                            //TODO: 强制升级
                         } else {
                             //TODO: data == null 已是最新版本..
                         }

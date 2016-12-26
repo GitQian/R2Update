@@ -20,6 +20,9 @@ public class AppConfig {
 
     public static final int MSG_REGISTER_CLIENT = 4;
 
+    public static final int UPDATE_START = 5;
+    public static final int UPDATE_FINISH = 6;
+
 
     public static final String DIR_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String FILE_NAME = "test.apk";

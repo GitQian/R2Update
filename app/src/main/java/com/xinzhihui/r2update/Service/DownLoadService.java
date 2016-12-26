@@ -86,6 +86,29 @@ public class DownLoadService extends Service {
                     }
                     break;
 
+                case AppConfig.UPDATE_START:
+                    Message msgUpdateStart = new Message();
+                    msgUpdateStart.what = AppConfig.UPDATE_START;
+                    if (mClient != null) {
+                        try {
+                            mClient.send(msgUpdateStart);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case AppConfig.UPDATE_FINISH:
+                    Message msgUpdateFinish = new Message();
+                    msgUpdateFinish.what = AppConfig.UPDATE_FINISH;
+                    if (mClient != null) {
+                        try {
+                            mClient.send(msgUpdateFinish);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+
                 case AppConfig.MSG_REGISTER_CLIENT:
                     mClient = msg.replyTo;
                     break;
@@ -197,8 +220,10 @@ public class DownLoadService extends Service {
                             @Override
                             public void run() {
                                 try {
+                                    sendMsg(AppConfig.UPDATE_START);
                                     //TODO: 升级
                                     Thread.sleep(5000);
+                                    sendMsg(AppConfig.UPDATE_FINISH);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
