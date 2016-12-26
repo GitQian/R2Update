@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -112,7 +111,7 @@ public class DownLoadService extends Service {
         nfIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mBuilder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
                 .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher)) // 设置下拉列表中的图标(大图标)
-                .setContentTitle("正在升级...") // 设置下拉列表里的标题
+                .setContentTitle("正在下载升级...") // 设置下拉列表里的标题
                 .setSmallIcon(R.mipmap.ic_launcher) // 设置状态栏内的小图标
                 .setContentText("触摸可显示录制界面") // 设置上下文内容
                 .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
@@ -128,7 +127,7 @@ public class DownLoadService extends Service {
         //TODO: MD5校验
         String md5Str = intent.getStringExtra("MD5STR");
         String md5OldStr = null;
-        File file = new File("/sdcard/test.png");
+        File file = new File(AppConfig.FILE_PATH);
         if (file.exists()) {
             md5OldStr = Md5Utils.getFileMD5(file);
         }
@@ -161,18 +160,18 @@ public class DownLoadService extends Service {
 
     private void downLoad() {
         OkHttpUtils.get()
-                .url("http://download.easyicon.net/png/1182979/128/")
+                .url("http://fileservice.365car.com.cn:88/fileService/downloads/appstore/365car_android.apk")
                 .build()
-                .execute(new FileCallBack(Environment.getExternalStorageDirectory().getAbsolutePath(), "test.png") {
+                .execute(new FileCallBack(AppConfig.DIR_PATH, AppConfig.FILE_NAME) {
                     @Override
                     public void inProgress(float progress, long total, int id) {
                         //TODO: 进度
                         super.inProgress(progress, total, id);
-                        Log.e("qiansheng", "progress" + (int) (progress / total) * 100);
+                        Log.e("qiansheng", "progress" + (int) (progress * 100));
 
                         Message message = new Message();
                         message.what = AppConfig.DOWN_LOAD_MSG;
-                        message.arg1 = (int) (progress / total) * 100;
+                        message.arg1 = (int) (progress * 100);
                         mHandler.sendMessage(message);
                     }
 

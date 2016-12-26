@@ -1,5 +1,7 @@
 package com.xinzhihui.r2update;
 
+import android.os.Environment;
+
 /**
  * Created by Administrator on 2016/12/22.
  */
@@ -17,5 +19,10 @@ public class AppConfig {
     public static final int DOWN_LOAD_ERROR = 3;
 
     public static final int MSG_REGISTER_CLIENT = 4;
+
+
+    public static final String DIR_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final String FILE_NAME = "test.apk";
+    public static final String FILE_PATH = DIR_PATH + FILE_NAME;
 
 }

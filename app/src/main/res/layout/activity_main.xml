@@ -19,21 +19,12 @@
         android:text="网络正常"
         android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/tv_main_check_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_main_net_notice"
-        android:layout_centerHorizontal="true"
-        android:padding="20dp"
-        android:text="正在检查设备..."
-        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/tv_main_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_main_check_status"
+        android:layout_below="@id/tv_main_net_notice"
         android:layout_centerHorizontal="true"
         android:padding="20dp"
         android:text="当前版本：01.01.01"
@@ -48,13 +39,4 @@
         android:text="检查设备是否可升级"
         android:textSize="20sp" />
 
-
-    <Button
-        android:id="@+id/btn_main_update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_main_check"
-        android:layout_centerHorizontal="true"
-        android:text="点击下载升级网络库"
-        android:textSize="20sp" />
 </RelativeLayout>
