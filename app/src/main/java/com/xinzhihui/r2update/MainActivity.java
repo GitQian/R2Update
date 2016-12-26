@@ -237,6 +237,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     })
                                     .create();
                             alertDialog.show();
+                        } else {
+                            //TODO: data == null 已是最新版本..
                         }
                     }
                 });

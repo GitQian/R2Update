@@ -133,6 +133,8 @@ public class DownLoadService extends Service {
         }
         if (md5OldStr != null && md5OldStr.equals(md5Str)) {
             //直接升级，不必下载
+            Toast.makeText(this, "正在升级...", Toast.LENGTH_LONG).show();
+
         }
 
         downLoad();
@@ -167,12 +169,7 @@ public class DownLoadService extends Service {
                     public void inProgress(float progress, long total, int id) {
                         //TODO: 进度
                         super.inProgress(progress, total, id);
-                        Log.e("qiansheng", "progress" + (int) (progress * 100));
-
-                        Message message = new Message();
-                        message.what = AppConfig.DOWN_LOAD_MSG;
-                        message.arg1 = (int) (progress * 100);
-                        mHandler.sendMessage(message);
+                        sendMsg(AppConfig.DOWN_LOAD_MSG, (int) (progress * 100));
                     }
 
                     @Override
@@ -180,9 +177,7 @@ public class DownLoadService extends Service {
                         super.onBefore(request, id);
                         startForeground(111, mNotification);
 
-                        Message message = new Message();
-                        message.what = AppConfig.DOWN_LOAD_START;
-                        mHandler.sendMessage(message);
+                        sendMsg(AppConfig.DOWN_LOAD_START);
                     }
 
                     @Override
@@ -191,10 +186,7 @@ public class DownLoadService extends Service {
                         stopForeground(true);
                         Toast.makeText(DownLoadService.this, "下载失败！", Toast.LENGTH_LONG).show();
 
-                        Message message = new Message();
-                        message.what = AppConfig.DOWN_LOAD_ERROR;
-                        mHandler.sendMessage(message);
-
+                        sendMsg(AppConfig.DOWN_LOAD_ERROR);
                         stopSelf();
                     }
 
@@ -211,17 +203,28 @@ public class DownLoadService extends Service {
                                     e.printStackTrace();
                                 }
                                 stopForeground(true);
+                                stopSelf();
                             }
                         }).start();
 
                         Toast.makeText(DownLoadService.this, "下载完成！正在升级...", Toast.LENGTH_LONG).show();
 
-                        Message message = new Message();
-                        message.what = AppConfig.DOWN_LOAD_FINISH;
-                        mHandler.sendMessage(message);
-
+                        sendMsg(AppConfig.DOWN_LOAD_FINISH);
 //                        stopSelf();
                     }
                 });
+    }
+
+    public void sendMsg(int what) {
+        Message message = new Message();
+        message.what = what;
+        mHandler.sendMessage(message);
+    }
+
+    public void sendMsg(int what, int arg1) {
+        Message message = new Message();
+        message.what = what;
+        message.arg1 = arg1;
+        mHandler.sendMessage(message);
     }
 }
