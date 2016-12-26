@@ -5,10 +5,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,96 +31,7 @@ public class DownLoadService extends Service {
     private Notification mNotification;
     Notification.Builder mBuilder;
 
-    Messenger mClient;
-
-    class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case AppConfig.DOWN_LOAD_START:
-                    Message msgStart = new Message();
-                    msgStart.what = AppConfig.DOWN_LOAD_START;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgStart);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-
-                case AppConfig.DOWN_LOAD_MSG:
-                    Message msgProgress = new Message();
-                    msgProgress.what = AppConfig.DOWN_LOAD_MSG;
-                    msgProgress.arg1 = msg.arg1;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgProgress);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-
-                case AppConfig.DOWN_LOAD_FINISH:
-                    Message msgFinish = new Message();
-                    msgFinish.what = AppConfig.DOWN_LOAD_FINISH;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgFinish);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-
-                case AppConfig.DOWN_LOAD_ERROR:
-                    Message msgError = new Message();
-                    msgError.what = AppConfig.DOWN_LOAD_ERROR;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgError);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-
-                case AppConfig.UPDATE_START:
-                    Message msgUpdateStart = new Message();
-                    msgUpdateStart.what = AppConfig.UPDATE_START;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgUpdateStart);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-                case AppConfig.UPDATE_FINISH:
-                    Message msgUpdateFinish = new Message();
-                    msgUpdateFinish.what = AppConfig.UPDATE_FINISH;
-                    if (mClient != null) {
-                        try {
-                            mClient.send(msgUpdateFinish);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-
-                case AppConfig.MSG_REGISTER_CLIENT:
-                    mClient = msg.replyTo;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-
-    private Handler mHandler = new IncomingHandler();
-    Messenger mMessenger = new Messenger(mHandler);
+    public Handler mHandler;
 
     public DownLoadService() {
     }
@@ -167,7 +78,7 @@ public class DownLoadService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         LogUtil.d(TAG, "DownLoadService onBind()");
-        return mMessenger.getBinder();
+        return new MyBinder();
     }
 
     @Override
@@ -241,15 +152,29 @@ public class DownLoadService extends Service {
     }
 
     public void sendMsg(int what) {
-        Message message = new Message();
-        message.what = what;
-        mHandler.sendMessage(message);
+        if (mHandler != null) {
+            Message message = new Message();
+            message.what = what;
+            mHandler.sendMessage(message);
+        }
     }
 
     public void sendMsg(int what, int arg1) {
-        Message message = new Message();
-        message.what = what;
-        message.arg1 = arg1;
-        mHandler.sendMessage(message);
+        if (mHandler != null) {
+            Message message = new Message();
+            message.what = what;
+            message.arg1 = arg1;
+            mHandler.sendMessage(message);
+        }
+    }
+
+    public class MyBinder extends Binder {
+        public DownLoadService getMyService() {
+            return DownLoadService.this;
+        }
+    }
+
+    public void setHandler(Handler handler) {
+        mHandler = handler;
     }
 }

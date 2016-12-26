@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +21,7 @@ import android.widget.Toast;
 
 import com.xinzhihui.r2update.Service.DownLoadService;
 import com.xinzhihui.r2update.Utils.CommonUtils;
+import com.xinzhihui.r2update.Utils.NetWorkUtils;
 import com.xinzhihui.r2update.bean.CheckUpdateBean;
 import com.xinzhihui.r2update.bean.CheckUpdateCallBack;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -43,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public ProgressDialog mUpdateProgress;
 
     private CheckUpdateBean mCheckUpdateBean;
+    private String mDeviceId;
 
     private static class MyHandler extends Handler {
         private final WeakReference<MainActivity> mActivity;
@@ -109,26 +109,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Handler mHandler = new MyHandler(this);
 
-    Messenger mSender = null;
-    Messenger mReceive = new Messenger(mHandler);
+    public DownLoadService mService;
 
     private class MyConnection implements ServiceConnection {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             // TODO Auto-generated method stub
-            mSender = new Messenger(service);
-
-            Message msg = new Message();
-            msg.what = AppConfig.MSG_REGISTER_CLIENT;
-            msg.replyTo = mReceive;
-
-            try {
-                mSender.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-
+            mService = ((DownLoadService.MyBinder) service).getMyService(); //获取Myservice对象
+            mService.setHandler(mHandler);
         }
 
         @Override
@@ -145,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         initView();
+
+        mDeviceId = CommonUtils.getSystemInfoLine();
+        Log.d("qiansheng", "DeviceId:" + mDeviceId);
     }
 
     @Override
@@ -186,7 +178,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_main_check:
-                checkUpdate();
+                if (!NetWorkUtils.isNetworkAvailable(this)) {
+                    Toast.makeText(this, "请检查网络", Toast.LENGTH_SHORT).show();
+                } else {
+                    checkUpdate();
+                }
                 break;
 
             default:
@@ -209,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addHeader("Auth-AppId", AppConfig.APP_ID)
                 .addHeader("Auth-Timestamp", timeStr)
                 .addHeader("Content-Type", "application/json;charset=UTF-8")
-                .addParams("deviceId", "54110c0c5190410c0000341000000000") //TODO: 没有
+                .addParams("deviceId", mDeviceId) //TODO: 没有
                 .addParams("versionCode", "010100") //TODO: 没有
                 .addParams("appVersion", "1.1")
                 .addParams("appName", "TestApp")
@@ -219,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .execute(new CheckUpdateCallBack() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
+                        Toast.makeText(getApplicationContext(), "请求失败", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                     }
 
